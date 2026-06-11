@@ -1,0 +1,50 @@
+import pytest      
+
+from modules.task import Task
+from modules.taskmanager import TaskManager
+
+@pytest.fixture    
+def sample_tasks():
+
+    manager = TaskManager()
+    task1 = Task(1, "svéčka", "něco z filozofie" )   
+    task2 = Task(2, "matika", "něco ze stereometrie" )                  
+    task3 = Task(3, "angličtina", "něco jednoduchého" )   
+
+    manager.add_order(task1)
+    manager.add_order(task2)
+    manager.add_order(task3)
+    return manager  
+
+def test_add_task(sample_tasks):
+    assert len(sample_tasks.get_all_tasks()) == 3
+
+def test_get_tasks_by_status(sample_tasks):
+    todo_tasks = sample_tasks.get_tasks_by_status("to-do")
+    assert len(todo_tasks) == 3  
+
+def test_update_task_status_valid(sample_tasks):
+
+    sample_tasks.update_task_status(1, "in progress")
+    assert sample_tasks.get_all_tasks()[0].status == "in progress"
+
+def test_update_task_status_invalid(sample_tasks):
+    result = sample_tasks.update_task_status(2, "unknown")
+    assert sample_tasks.get_all_tasks()[1].status == "in progress"  
+    assert result == "Neplatný stav objednávky!"
+
+def test_update_nonexistent_task_in_populated_cafe(sample_tasks):
+    result = sample_tasks.update_task_status(99, "done")
+    assert result == "Chyba: Task s tímto ID neexistuje"
+
+
+def test_task_workflow():
+
+    manager = TaskManager()
+    task = Task(7, "čeština", "něco do slohu")
+
+    manager.add_task(task)
+    assert len(manager.get_all_tasks()) == 1  
+
+    task.update_task_status(7, "done")
+    assert task.status == "done"       

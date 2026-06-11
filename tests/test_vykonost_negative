@@ -1,0 +1,29 @@
+import pytest      
+import time
+
+from modules.task import Task
+from modules.taskmanager import TaskManager
+
+
+def test_update_nonexistent_task_in_empty_manager():
+    manager = TaskManager()  
+    result = manager.update_task_status(999, "done")
+    assert result == "Task 999 nebyl nalezen"
+
+
+def test_large_task_list():
+    manager = TaskManager()
+    for i in range(1000):
+        manager.add_task(Task(i, f"úkol {i}", "něco"))
+    assert len(manager.get_all_tasks()) == 1000
+
+
+def test_large_task_performance():
+    manager = TaskManager()
+    start_time = time.time() 
+
+    for i in range(10000):
+        manager.add_order(Task(i, f"úkol {i}", "něco" ))
+
+    end_time = time.time()    
+    assert end_time - start_time < 1.0  
